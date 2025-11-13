@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cubnm_paper"
+version = "0.1.0"
+
+[tool.setuptools]
+packages = ["cubnm_paper"]
+
+[tool.setuptools.package-dir]
+cubnm_paper = "scripts/cubnm_paper"

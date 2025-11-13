@@ -1,0 +1,14 @@
+cubnm[cu12]>=0.1.0rc1,<0.2
+cupy-cuda12x~=13.6.0
+numba-cuda[cu12]~=0.20.0
+seaborn~=0.13.0
+nbconvert>=7.0
+tqdm~=4.0
+ipykernel
+vtk~=9.4.0
+neuromaps==0.0.5
+nilearn~=0.10.0
+netneurotools~=0.3.0
+pyvista~=0.45.0
+pingouin==0.5.5
+datalad~=0.18.0
