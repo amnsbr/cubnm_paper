@@ -1,4 +1,4 @@
-# cuBNM Paper: Reproducibility Code
+# cuBNM Paper Code
 
 This repository contains the code and analysis scripts for running the experiments in "cuBNM: GPU-Accelerated Brain Network Modeling" (Saberi et al.).
 
@@ -52,11 +52,11 @@ Individualized modeling requires preprocessed Human Connectome Project (HCP) dat
 ```
 ./data/hcp/
 ├── SC/                          # Structural connectivity matrices
-├── FC/                          # Functional connectivity matrices
+├── FC/                          # Functional connectivity and dynamics matrices
 ├── pedi/                        # Pedigree information (SOLAR format)
 ├── samples/                     # Subject ID lists (.txt files)
-├── pheno_unrestricted.csv      # Unrestricted phenotype data
-└── pheno_restricted.csv        # Restricted phenotype data
+├── pheno_unrestricted.csv       # Unrestricted phenotype data
+└── pheno_restricted.csv         # Restricted phenotype data
 ```
 
 ### Output Data
@@ -65,23 +65,23 @@ Running the scripts will generate:
 - `./data/hcp/solar/`: Heritability analysis outputs
 - `./data/scaling/`: Scaling analysis results (JSON files), which are combined into `./data/scaling.csv`
 
-## Repository Structure
+## Scripts Structure
 ```
 ./scripts/
 ├── setup/                       # Environment setup scripts
-├── cubnm_paper/                 # Paper package code
+├── cubnm_paper/                 # cubnm_paper package code
 │   ├── data/                    # Data handling utilities
 │   ├── config/                  # Configurations
 │   └── utils/                   # Statistics and plotting functions
-├── sim/                         # Simulation experiments
+├── sim/                         # Simulation/optimization runs
 │   ├── grid/                    # Grid search
 │   ├── cmaes/                   # CMA-ES optimization
 │   ├── scaling/                 # Scaling analyses
 │   └── run_N_sim.py             # CPU reference simulations
 ├── heritability/                # Heritability calculations
 ├── figures/                     # Figure generation and statistics
-├── run_all.sh                   # Master script (SLURM cluster)
-└── run_*.sbatch                 # Generic SLURM job scripts
+├── run_all.sh                   # Master script (Raven cluster)
+└── run_*.sbatch                 # Generic SLURM job scripts on Raven
 ```
 
 ## Usage
@@ -99,24 +99,25 @@ This executes all simulations and analyses except:
 - Local PC scaling analysis (see below)
 
 ### Running Individual Components
+Set the `PROJECT_DIR` environment variable and run the following commands as needed.
 
 **Figure 3 - Group-level homogeneous grid search:**
 ```bash
-sbatch scripts/run_gpu.sbatch scripts/sim/grid/run.py --sub group-train706 --grid_shape 22
+sbatch --export=ALL scripts/run_gpu.sbatch scripts/sim/grid/run.py --sub group-train706 --grid_shape 22
 ```
 
 **Figure 4 - Group-level homogeneous CMA-ES:**
 ```bash
-sbatch scripts/run_gpu.sbatch scripts/sim/cmaes/run.py run --subs group-train706 --het_mode homo --seed 1
+sbatch --export=ALL scripts/run_gpu.sbatch scripts/sim/cmaes/run.py run --subs group-train706 --het_mode homo --seed 1
 ```
 
 **Figure 5 - Group-level heterogeneous CMA-ES:**
 ```bash
 # Map-based heterogeneity
-sbatch scripts/run_gpu.sbatch scripts/sim/cmaes/run.py run --subs group-train706 --het_mode 2maps --seed 1
+sbatch --export=ALL scripts/run_gpu.sbatch scripts/sim/cmaes/run.py run --subs group-train706 --het_mode 2maps --seed 1
 
 # Node-based heterogeneity
-sbatch scripts/run_gpu.sbatch scripts/sim/cmaes/run.py run --subs group-train706 --het_mode yeo --seed 1
+sbatch --export=ALL scripts/run_gpu.sbatch scripts/sim/cmaes/run.py run --subs group-train706 --het_mode yeo --seed 1
 ```
 
 **Figure 6 - Individualized CMA-ES:**
@@ -130,7 +131,9 @@ bash scripts/sim/cmaes/run_qx_subs.sh 8 12 "--ses=REST1_LR --n_runs=2 --het_mode
 bash scripts/sim/cmaes/run_qx_subs.sh 8 12 "--ses=REST1_LR --n_runs=2 --het_mode=2maps --subset=twins_unrelated_96"
 
 # Calculate heritability (requires completed CMA-ES runs)
-sbatch scripts/run_gpu.sbatch scripts/heritability/calculate_h2.py --sessions REST1_LR REST2_LR
+sbatch --export=ALL scripts/run_gpu.sbatch scripts/heritability/calculate_h2.py --sessions REST1_LR REST2_LR
+sbatch --export=ALL scripts/run_gpu.sbatch scripts/heritability/calculate_h2.py --sessions REST1_LR
+sbatch --export=ALL scripts/run_gpu.sbatch scripts/heritability/calculate_h2.py --sessions REST2_LR
 ```
 
 **Figure 7 - Scaling analysis:**
@@ -144,17 +147,17 @@ bash scripts/sim/scaling/run_all_pc.sh
 
 **Figure S7 - CPU-GPU identity verification:**
 ```bash
-sbatch scripts/run_gpu.sbatch scripts/sim/grid/run.py --sub group-train706 --grid_shape 10 --cpu_gpu_identity
-sbatch scripts/run_cpu.sbatch scripts/sim/grid/run.py --sub group-train706 --grid_shape 10 --cpu_gpu_identity
+sbatch --export=ALL scripts/run_gpu.sbatch scripts/sim/grid/run.py --sub group-train706 --grid_shape 10 --cpu_gpu_identity
+sbatch --export=ALL scripts/run_cpu.sbatch scripts/sim/grid/run.py --sub group-train706 --grid_shape 10 --cpu_gpu_identity
 ```
 
-**Reference compute time benchmarks:**
+**CPU reference compute times:**
 ```bash
 # Single simulation (Main text)
-sbatch scripts/run_cpu_single.sbatch scripts/sim/run_N_sim.py --N 1
+sbatch --export=ALL scripts/run_cpu_single.sbatch scripts/sim/run_N_sim.py --N 1
 
 # 128-simulation batch (Supplementary Text A.3)
-sbatch scripts/run_cpu.sbatch scripts/sim/run_N_sim.py --N 128
+sbatch --export=ALL scripts/run_cpu.sbatch scripts/sim/run_N_sim.py --N 128
 ```
 
 ## Support
