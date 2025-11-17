@@ -1,6 +1,6 @@
 # cuBNM Paper Code
 
-This repository contains the code and analysis scripts for running the experiments in "cuBNM: GPU-Accelerated Brain Network Modeling" (Saberi et al.).
+This repository contains the code and analysis scripts for running the experiments in Saberi et al., "cuBNM: GPU-Accelerated Brain Network Modeling" ([preprint](https://www.biorxiv.org/content/10.1101/2025.11.13.688224v1)).
 
 ## Overview
 
